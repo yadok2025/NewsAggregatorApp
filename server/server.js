@@ -278,6 +278,87 @@ app.get('/api/memory/search', (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// ==================== SKILLS API ====================
+
+const SKILLS_DIR = '/home/yadok/.hermes/skills';
+
+// Listar todas las skills
+app.get('/api/skills', (req, res) => {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const skills = [];
+
+    function scanDir(dir, category = null) {
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          scanDir(fullPath, entry.name);
+        } else if (entry.name === 'SKILL.md') {
+          const content = fs.readFileSync(fullPath, 'utf-8');
+          // Parse frontmatter
+          const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+          let meta = {};
+          if (frontmatterMatch) {
+            const fm = frontmatterMatch[1];
+            fm.split('\n').forEach(line => {
+              const colonIdx = line.indexOf(':');
+              if (colonIdx > 0) {
+                const key = line.substring(0, colonIdx).trim();
+                const val = line.substring(colonIdx + 1).trim();
+                meta[key] = val;
+              }
+            });
+          }
+          skills.push({
+            name: meta.name || path.basename(path.dirname(fullPath)),
+            description: meta.description || '',
+            category: category || meta.category || null,
+            version: meta.version || null,
+            author: meta.author || null,
+            platforms: meta.platforms ? meta.platforms.split(';') : [],
+            path: fullPath.replace(SKILLS_DIR + '/', '')
+          });
+        }
+      }
+    }
+
+    scanDir(SKILLS_DIR);
+    res.json({ skills, count: skills.length });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Obtener contenido de una skill
+app.get('/api/skills/:name', (req, res) => {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const skillName = req.params.name;
+
+    // Buscar la skill en el directorio
+    function findSkill(dir) {
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          const found = findSkill(fullPath);
+          if (found) return found;
+        } else if (entry.name === 'SKILL.md' && path.basename(dir) === skillName) {
+          return fullPath;
+        }
+      }
+      return null;
+    }
+
+    const skillPath = findSkill(SKILLS_DIR);
+    if (!skillPath) return res.status(404).json({ error: 'Skill no encontrada' });
+
+    const content = fs.readFileSync(skillPath, 'utf-8');
+    res.type('text/plain').send(content);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // ==================== FRONTEND (producción) ====================
 
 // Servir el build del cliente si existe
@@ -338,87 +419,6 @@ app.patch('/api/world/:id', (req, res) => {
     db.close();
     if (result.changes === 0) return res.status(404).json({ error: 'No encontrado' });
     res.json({ ok: true, changed: field });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-// ==================== SKILLS API ====================
-
-const SKILLS_DIR = '/home/yadok/.hermes/skills';
-
-// Listar todas las skills
-app.get('/api/skills', (req, res) => {
-  try {
-    const fs = require('fs');
-    const path = require('path');
-    const skills = [];
-    
-    function scanDir(dir, category = null) {
-      const entries = fs.readdirSync(dir, { withFileTypes: true });
-      for (const entry of entries) {
-        const fullPath = path.join(dir, entry.name);
-        if (entry.isDirectory()) {
-          scanDir(fullPath, entry.name);
-        } else if (entry.name === 'SKILL.md') {
-          const content = fs.readFileSync(fullPath, 'utf-8');
-          // Parse frontmatter
-          const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
-          let meta = {};
-          if (frontmatterMatch) {
-            const fm = frontmatterMatch[1];
-            fm.split('\n').forEach(line => {
-              const colonIdx = line.indexOf(':');
-              if (colonIdx > 0) {
-                const key = line.substring(0, colonIdx).trim();
-                const val = line.substring(colonIdx + 1).trim();
-                meta[key] = val;
-              }
-            });
-          }
-          skills.push({
-            name: meta.name || path.basename(path.dirname(fullPath)),
-            description: meta.description || '',
-            category: category || meta.category || null,
-            version: meta.version || null,
-            author: meta.author || null,
-            platforms: meta.platforms ? meta.platforms.split(';') : [],
-            path: fullPath.replace(SKILLS_DIR + '/', '')
-          });
-        }
-      }
-    }
-    
-    scanDir(SKILLS_DIR);
-    res.json({ skills, count: skills.length });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-// Obtener contenido de una skill
-app.get('/api/skills/:name', (req, res) => {
-  try {
-    const fs = require('fs');
-    const path = require('path');
-    const skillName = req.params.name;
-    
-    // Buscar la skill en el directorio
-    function findSkill(dir) {
-      const entries = fs.readdirSync(dir, { withFileTypes: true });
-      for (const entry of entries) {
-        const fullPath = path.join(dir, entry.name);
-        if (entry.isDirectory()) {
-          const found = findSkill(fullPath);
-          if (found) return found;
-        } else if (entry.name === 'SKILL.md' && path.basename(dir) === skillName) {
-          return fullPath;
-        }
-      }
-      return null;
-    }
-    
-    const skillPath = findSkill(SKILLS_DIR);
-    if (!skillPath) return res.status(404).json({ error: 'Skill no encontrada' });
-    
-    const content = fs.readFileSync(skillPath, 'utf-8');
-    res.type('text/plain').send(content);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
