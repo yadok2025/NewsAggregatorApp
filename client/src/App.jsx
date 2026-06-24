@@ -20,6 +20,7 @@ function App() {
   const [mapView, setMapView] = useState(false)
   const [memoryView, setMemoryView] = useState(false)
   const [listSkillView, setListSkillView] = useState(false)
+  const [darkMode, setDarkMode] = useState(true)
 
   const showToast = useCallback((msg, type = 'success') => {
     setToast({ msg, type })
@@ -223,7 +224,7 @@ function App() {
 
       {listSkillView ? (
         <div className="listskill-view">
-          <ListSkill />
+          <ListSkill darkMode={darkMode} setDarkMode={setDarkMode} />
         </div>
       ) : memoryView ? (
         <div className="memory-view">
