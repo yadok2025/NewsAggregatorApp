@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+client/node_modules/
+client/dist/
+
+# Build
+client/dist/
+dist/
+
+# Environment
+.env
+.env.local
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Runtime
+*.pid
+*.seed
+
+# Secrets (never commit!)
+*token*
+*secret*
+*password*
+.git-credentials
