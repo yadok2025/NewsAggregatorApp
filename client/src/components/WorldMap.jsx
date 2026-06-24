@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { MapContainer, TileLayer, CircleMarker, Popup, useMap, GridLayer } from 'react-leaflet'
+import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 
 const COUNTRY_COORDS = {
@@ -179,23 +179,6 @@ function FlyToBounds({ events }) {
   return null
 }
 
-/* Custom grid overlay */
-function HermesGrid() {
-  const map = useMap()
-  useEffect(() => {
-    const gridLines = []
-    // Add grid lines via SVG overlay
-    const updateGrid = () => {
-      const bounds = map.getBounds()
-      const zoom = map.getZoom()
-      if (zoom < 4) return
-    }
-    map.on('moveend', updateGrid)
-    return () => map.off('moveend', updateGrid)
-  }, [map])
-  return null
-}
-
 export default function WorldMap({ snapshots, tab, onEditEvent }) {
   const [query, setQuery] = useState('')
   const [topicFilter, setTopicFilter] = useState('')
@@ -336,7 +319,6 @@ export default function WorldMap({ snapshots, tab, onEditEvent }) {
             attribution='&copy; <a href="https://carto.com/">CARTO</a>'
             url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
           />
-          <HermesGrid />
           <FlyToBounds events={filteredEvents} />
 
           {clusteredEvents.map(({ key, coords, events, count }) => (
