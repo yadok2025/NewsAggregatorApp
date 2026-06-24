@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import WorldMap from './components/WorldMap'
 import MemoryDashboard from './components/MemoryDashboard'
+import ListSkill from './components/ListSkill'
 
 const API = '/api'
 
@@ -18,6 +19,7 @@ function App() {
   const [snapshotIdForEvent, setSnapshotIdForEvent] = useState(null)
   const [mapView, setMapView] = useState(false)
   const [memoryView, setMemoryView] = useState(false)
+  const [listSkillView, setListSkillView] = useState(false)
 
   const showToast = useCallback((msg, type = 'success') => {
     setToast({ msg, type })
@@ -195,6 +197,12 @@ function App() {
           >
             🧠 Memoria
           </button>
+          <button
+            className={`btn btn-skills ${listSkillView ? 'btn-primary' : ''}`}
+            onClick={() => setListSkillView(!listSkillView)}
+          >
+            📚 Skills
+          </button>
         </div>
       </header>
 
@@ -213,7 +221,11 @@ function App() {
         </button>
       </div>
 
-      {memoryView ? (
+      {listSkillView ? (
+        <div className="listskill-view">
+          <ListSkill />
+        </div>
+      ) : memoryView ? (
         <div className="memory-view">
           <MemoryDashboard />
         </div>
