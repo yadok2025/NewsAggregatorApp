@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, CircleMarker, Popup, useMap, GridLayer } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 
 const COUNTRY_COORDS = {
@@ -59,153 +59,64 @@ const COUNTRY_COORDS = {
 }
 
 const TECH_HUBS = {
-  'san francisco': [37.77, -122.42],
-  'new york': [40.71, -74.01],
-  'seattle': [47.61, -122.33],
-  'london': [51.51, -0.13],
-  'berlin': [52.52, 13.41],
-  'tokyo': [35.68, 139.69],
-  'beijing': [39.90, 116.40],
-  'shanghai': [31.23, 121.47],
-  'bangalore': [12.97, 77.59],
-  'singapore': [1.35, 103.82],
-  'tel aviv': [32.09, 34.78],
-  'toronto': [43.65, -79.38],
-  'paris': [48.86, 2.35],
-  'amsterdam': [52.37, 4.90],
-  'stockholm': [59.33, 18.07],
-  'austin': [30.27, -97.74],
-  'boston': [42.36, -71.06],
-  'mumbai': [19.08, 72.88],
-  'seoul': [37.57, 126.98],
-  'sydney': [-37.81, 144.96],
-  'shenzhen': [22.54, 114.06],
-  'hangzhou': [30.27, 120.15],
-  'dubai': [25.20, 55.27],
-  'riyadh': [24.71, 46.68],
-  'istanbul': [41.01, 28.98],
-  'moscow': [55.76, 37.62],
-  'kyiv': [50.45, 30.52],
-  'warsaw': [52.23, 21.01],
-  'prague': [50.08, 14.44],
-  'budapest': [47.50, 19.04],
-  'vienna': [48.21, 16.37],
-  'zurich': [47.37, 8.54],
-  'munich': [48.14, 11.58],
-  'hamburg': [53.55, 9.99],
-  'frankfurt': [50.11, 8.68],
-  'copenhagen': [55.68, 12.57],
-  'oslo': [59.91, 10.75],
-  'helsinki': [60.17, 24.94],
-  'dublin': [53.35, -6.26],
-  'lisbon': [38.72, -9.14],
-  'barcelona': [41.39, 2.17],
-  'madrid': [40.42, -3.70],
-  'rome': [41.90, 12.50],
-  'milan': [45.46, 9.19],
-  'melbourne': [-37.81, 144.96],
-  'vancouver': [49.28, -123.12],
-  'montreal': [45.50, -73.57],
-  'los angeles': [34.05, -118.24],
-  'chicago': [41.88, -87.63],
-  'houston': [29.76, -95.37],
-  'phoenix': [33.45, -112.07],
-  'san diego': [32.72, -117.16],
-  'denver': [39.74, -104.99],
-  'portland': [45.52, -122.68],
-  'miami': [25.76, -80.19],
-  'atlanta': [33.75, -84.39],
-  'minneapolis': [44.98, -93.27],
-  'detroit': [42.33, -83.05],
-  'kolkata': [22.57, 88.36],
-  'chennai': [13.08, 80.27],
-  'hyderabad': [17.39, 78.49],
-  'pune': [18.52, 73.86],
-  'ahmedabad': [23.02, 72.57],
-  'kochi': [9.93, 76.26],
-  'jakarta': [-6.21, 106.85],
-  'bangkok': [13.76, 100.50],
-  'ho chi minh': [10.82, 106.63],
-  'manila': [14.60, 120.98],
-  'taipei': [25.03, 121.57],
-  'hong kong': [22.32, 114.17],
-  'shenyang': [41.80, 123.43],
-  'chengdu': [30.57, 104.07],
-  'wuhan': [30.59, 114.31],
-  'zhengzhou': [34.75, 113.65],
-  'hefei': [31.82, 117.25],
-  'nanjing': [32.06, 118.80],
-  'guangzhou': [23.13, 113.26],
-  'xiamen': [24.48, 118.09],
-  'ningbo': [29.87, 121.55],
-  'wuxi': [31.49, 120.31],
-  'tianjin': [39.34, 117.36],
-  'dalian': [38.91, 121.62],
-  'qingdao': [36.07, 120.38],
-  'kunming': [25.04, 102.73],
-  'fuzhou': [26.07, 119.30],
-  'changsha': [28.23, 112.94],
-  'nanning': [22.82, 108.37],
-  'urumqi': [43.80, 87.60],
-  'lhasa': [29.65, 91.10],
-  'lanzhou': [36.06, 103.83],
-  'taiyuan': [37.87, 112.55],
-  'shijiazhuang': [38.04, 114.50],
-  'jinan': [36.67, 116.99],
-  'harbin': [45.75, 126.65],
-  'changchun': [43.88, 125.32],
-  'hohhot': [40.84, 111.75],
-  'nairobi': [-1.29, 36.82],
-  'lagos': [6.52, 3.38],
-  'cairo': [30.04, 31.24],
-  'johannesburg': [-26.20, 28.04],
-  'cape town': [-33.93, 18.42],
-  'accra': [5.60, -0.19],
-  'addis ababa': [9.02, 38.75],
-  'casablanca': [33.57, -7.59],
-  'tunis': [36.81, 10.18],
-  'algiers': [36.75, 3.06],
-  'buenos aires': [-34.60, -58.38],
-  'santiago': [-33.45, -70.67],
-  'bogota': [4.71, -74.07],
-  'lima': [-12.05, -77.04],
-  'caracas': [10.48, -66.90],
-  'mexico city': [19.43, -99.13],
-  'rio de janeiro': [-22.91, -43.17],
-  'sao paulo': [-23.55, -46.63],
-  'brasilia': [-15.79, -47.88],
-  'montevideo': [-34.90, -56.16],
-  'quito': [-0.18, -78.47],
-  'la paz': [-16.49, -68.12],
-  'asuncion': [-25.26, -57.58],
-  'tegucigalpa': [14.07, -87.19],
-  'guatemala city': [14.63, -90.51],
-  'san salvador': [13.69, -89.22],
-  'managua': [12.11, -86.24],
-  'san jose': [9.93, -84.09],
-  'panama city': [8.98, -79.52],
-  'havana': [23.11, -82.37],
-  'kingston': [18.00, -76.79],
-  'santo domingo': [18.50, -69.90],
-  'port-au-prince': [18.59, -72.31],
-  'baku': [40.41, 49.87],
-  'tbilisi': [41.72, 44.83],
-  'yerevan': [40.18, 44.51],
-  'astana': [51.17, 71.44],
-  'tashkent': [41.30, 69.28],
-  'bishkek': [42.87, 74.57],
-  'dushanbe': [38.56, 68.77],
-  'ashgabat': [37.96, 58.33],
-  'kabul': [34.53, 69.16],
-  'islamabad': [33.68, 73.05],
-  'karachi': [24.86, 67.01],
-  'lahore': [31.55, 74.36],
-  'dhaka': [23.81, 90.41],
-  'colombo': [6.93, 79.86],
-  'kathmandu': [27.72, 85.32],
-  'yangon': [16.87, 96.19],
-  'kuala lumpur': [3.14, 101.70],
-  'hanoi': [21.03, 105.85],
+  'san francisco': [37.77, -122.42], 'new york': [40.71, -74.01],
+  'seattle': [47.61, -122.33], 'london': [51.51, -0.13],
+  'berlin': [52.52, 13.41], 'tokyo': [35.68, 139.69],
+  'beijing': [39.90, 116.40], 'shanghai': [31.23, 121.47],
+  'bangalore': [12.97, 77.59], 'singapore': [1.35, 103.82],
+  'tel aviv': [32.09, 34.78], 'toronto': [43.65, -79.38],
+  'paris': [48.86, 2.35], 'amsterdam': [52.37, 4.90],
+  'stockholm': [59.33, 18.07], 'austin': [30.27, -97.74],
+  'boston': [42.36, -71.06], 'mumbai': [19.08, 72.88],
+  'seoul': [37.57, 126.98], 'sydney': [-37.81, 144.96],
+  'shenzhen': [22.54, 114.06], 'hangzhou': [30.27, 120.15],
+  'dubai': [25.20, 55.27], 'riyadh': [24.71, 46.68],
+  'istanbul': [41.01, 28.98], 'moscow': [55.76, 37.62],
+  'kyiv': [50.45, 30.52], 'warsaw': [52.23, 21.01],
+  'prague': [50.08, 14.44], 'budapest': [47.50, 19.04],
+  'vienna': [48.21, 16.37], 'zurich': [47.37, 8.54],
+  'munich': [48.14, 11.58], 'hamburg': [53.55, 9.99],
+  'frankfurt': [50.11, 8.68], 'copenhagen': [55.68, 12.57],
+  'oslo': [59.91, 10.75], 'helsinki': [60.17, 24.94],
+  'dublin': [53.35, -6.26], 'lisbon': [38.72, -9.14],
+  'barcelona': [41.39, 2.17], 'madrid': [40.42, -3.70],
+  'rome': [41.90, 12.50], 'milan': [45.46, 9.19],
+  'melbourne': [-37.81, 144.96], 'vancouver': [49.28, -123.12],
+  'montreal': [45.50, -73.57], 'los angeles': [34.05, -118.24],
+  'chicago': [41.88, -87.63], 'houston': [29.76, -95.37],
+  'phoenix': [33.45, -112.07], 'san diego': [32.72, -117.16],
+  'denver': [39.74, -104.99], 'portland': [45.52, -122.68],
+  'miami': [25.76, -80.19], 'atlanta': [33.75, -84.39],
+  'minneapolis': [44.98, -93.27], 'detroit': [42.33, -83.05],
+  'kolkata': [22.57, 88.36], 'chennai': [13.08, 80.27],
+  'hyderabad': [17.39, 78.49], 'pune': [18.52, 73.86],
+  'ahmedabad': [23.02, 72.57], 'jakarta': [-6.21, 106.85],
+  'bangkok': [13.76, 100.50], 'manila': [14.60, 120.98],
+  'hong kong': [22.32, 114.17], 'chengdu': [30.57, 104.07],
+  'wuhan': [30.59, 114.31], 'nairobi': [-1.29, 36.82],
+  'lagos': [6.52, 3.38], 'cairo': [30.04, 31.24],
+  'johannesburg': [-26.20, 28.04], 'cape town': [-33.93, 18.42],
+  'accra': [5.60, -0.19], 'casablanca': [33.57, -7.59],
+  'buenos aires': [-34.60, -58.38], 'santiago': [-33.45, -70.67],
+  'bogota': [4.71, -74.07], 'lima': [-12.05, -77.04],
+  'mexico city': [19.43, -99.13], 'rio de janeiro': [-22.91, -43.17],
+  'sao paulo': [-23.55, -46.63], 'brasilia': [-15.79, -47.88],
+  'montevideo': [-34.90, -56.16], 'quito': [-0.18, -78.47],
+  'la paz': [-16.49, -68.12], 'asuncion': [-25.26, -57.58],
+  'tegucigalpa': [14.07, -87.19], 'guatemala city': [14.63, -90.51],
+  'san salvador': [13.69, -89.22], 'managua': [12.11, -86.24],
+  'san jose': [9.93, -84.09], 'panama city': [8.98, -79.52],
+  'havana': [23.11, -82.37], 'kingston': [18.00, -76.79],
+  'santo domingo': [18.50, -69.90], 'port-au-prince': [18.59, -72.31],
+  'baku': [40.41, 49.87], 'tbilisi': [41.72, 44.83],
+  'yerevan': [40.18, 44.51], 'astana': [51.17, 71.44],
+  'tashkent': [41.30, 69.28], 'bishkek': [42.87, 74.57],
+  'dushanbe': [38.56, 68.77], 'ashgabat': [37.96, 58.33],
+  'kabul': [34.53, 69.16], 'islamabad': [33.68, 73.05],
+  'karachi': [24.86, 67.01], 'lahore': [31.55, 74.36],
+  'dhaka': [23.81, 90.41], 'colombo': [6.93, 79.86],
+  'kathmandu': [27.72, 85.32], 'yangon': [16.87, 96.19],
+  'kuala lumpur': [3.14, 101.70], 'hanoi': [21.03, 105.85],
 }
 
 function getEventCoords(event, tab) {
@@ -213,15 +124,12 @@ function getEventCoords(event, tab) {
     const countries = event.countries || []
     if (countries.length > 0) {
       const code = countries[0].toUpperCase()
-      if (COUNTRY_COORDS[code]) {
-        return COUNTRY_COORDS[code]
-      }
+      if (COUNTRY_COORDS[code]) return COUNTRY_COORDS[code]
     }
     return guessCoordsFromText(event.title || event.summary || '')
-  } else {
-    const text = `${event.title || ''} ${event.summary || ''} ${event.source || ''} ${event.keywords?.join(' ') || ''}`
-    return guessCoordsFromText(text)
   }
+  const text = `${event.title || ''} ${event.summary || ''} ${event.source || ''} ${event.keywords?.join(' ') || ''}`
+  return guessCoordsFromText(text)
 }
 
 function guessCoordsFromText(text) {
@@ -232,35 +140,32 @@ function guessCoordsFromText(text) {
       return [coords[0] + (Math.random() - 0.5) * 0.5, coords[1] + (Math.random() - 0.5) * 0.5]
     }
   }
-  const defaults = [
-    [37.77, -122.42], [51.51, -0.13], [35.68, 139.69],
-    [39.90, 116.40], [12.97, 77.59], [1.35, 103.82],
-  ]
+  const defaults = [[37.77, -122.42], [51.51, -0.13], [35.68, 139.69], [39.90, 116.40], [12.97, 77.59], [1.35, 103.82]]
   return defaults[Math.floor(Math.random() * defaults.length)]
 }
 
 function getEventColor(event, tab) {
   if (tab === 'world') {
     const topics = event.topics || []
-    if (topics.includes('politics')) return '#e74c3c'
-    if (topics.includes('geopolitics')) return '#e67e22'
-    if (topics.includes('economy')) return '#2ecc71'
-    if (topics.includes('technology')) return '#3498db'
-    if (topics.includes('sports')) return '#9b59b6'
-    if (topics.includes('culture')) return '#1abc9c'
-    return '#f39c12'
+    if (topics.includes('politics')) return '#ef4444'
+    if (topics.includes('geopolitics')) return '#f97316'
+    if (topics.includes('economy')) return '#10b981'
+    if (topics.includes('technology')) return '#06b6d4'
+    if (topics.includes('sports')) return '#8b5cf6'
+    if (topics.includes('culture')) return '#14b8a6'
+    return '#eab308'
   }
   const cat = (event.category || '').toLowerCase()
-  if (cat.includes('ai') || cat.includes('ml')) return '#9b59b6'
-  if (cat.includes('security') || cat.includes('crypto')) return '#e74c3c'
-  if (cat.includes('hardware')) return '#e67e22'
-  if (cat.includes('software') || cat.includes('open source')) return '#2ecc71'
-  return '#3498db'
+  if (cat.includes('ai') || cat.includes('ml')) return '#8b5cf6'
+  if (cat.includes('security') || cat.includes('crypto')) return '#ef4444'
+  if (cat.includes('hardware')) return '#f97316'
+  if (cat.includes('software') || cat.includes('open source')) return '#10b981'
+  return '#06b6d4'
 }
 
 function getEventRadius(event) {
   const importance = event.importance || 50
-  return Math.max(5, Math.min(20, importance / 5))
+  return Math.max(6, Math.min(22, importance / 4.5))
 }
 
 function FlyToBounds({ events }) {
@@ -268,11 +173,26 @@ function FlyToBounds({ events }) {
   useEffect(() => {
     if (events.length > 0) {
       const bounds = events.map(e => e._coords).filter(Boolean)
-      if (bounds.length > 0) {
-        map.fitBounds(bounds, { padding: [30, 30], maxZoom: 5 })
-      }
+      if (bounds.length > 0) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 5 })
     }
   }, [events, map])
+  return null
+}
+
+/* Custom grid overlay */
+function HermesGrid() {
+  const map = useMap()
+  useEffect(() => {
+    const gridLines = []
+    // Add grid lines via SVG overlay
+    const updateGrid = () => {
+      const bounds = map.getBounds()
+      const zoom = map.getZoom()
+      if (zoom < 4) return
+    }
+    map.on('moveend', updateGrid)
+    return () => map.off('moveend', updateGrid)
+  }, [map])
   return null
 }
 
@@ -292,12 +212,7 @@ export default function WorldMap({ snapshots, tab, onEditEvent }) {
         evts.forEach(ev => {
           const coords = getEventCoords(ev, tab)
           if (coords) {
-            events.push({
-              ...ev,
-              _snapshotId: snapshot.id,
-              _coords: coords,
-              _tab: tab,
-            })
+            events.push({ ...ev, _snapshotId: snapshot.id, _coords: coords, _tab: tab })
           }
         })
       } catch {}
@@ -342,205 +257,160 @@ export default function WorldMap({ snapshots, tab, onEditEvent }) {
     filteredEvents.forEach(ev => {
       const [lat, lon] = ev._coords
       const key = `${lat.toFixed(1)},${lon.toFixed(1)}`
-      if (!grid.has(key)) {
-        grid.set(key, [])
-      }
+      if (!grid.has(key)) grid.set(key, [])
       grid.get(key).push(ev)
     })
     return Array.from(grid.entries()).map(([key, evts]) => ({
-      key,
-      coords: evts[0]._coords,
-      events: evts,
-      count: evts.length,
+      key, coords: evts[0]._coords, events: evts, count: evts.length,
       maxImportance: Math.max(...evts.map(e => e.importance || 0)),
     }))
   }, [filteredEvents])
 
   return (
-    <div className="worldmap-container">
-      <div className="map-filters">
+    <div className="map-container-hermes">
+      {/* Filters bar */}
+      <div className="map-filters-hermes">
         <div className="filter-row">
-          <input
-            type="text"
-            className="input search-input"
-            placeholder="Buscar eventos..."
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-          />
-          <select
-            className="input"
-            value={topicFilter}
-            onChange={e => setTopicFilter(e.target.value)}
-          >
+          <input type="text" className="input-hermes map-search" placeholder="Buscar eventos..."
+            value={query} onChange={e => setQuery(e.target.value)} />
+          <select className="input-hermes" value={topicFilter} onChange={e => setTopicFilter(e.target.value)}>
             <option value="">Todos los topics</option>
-            {allTopics.map(t => (
-              <option key={t} value={t}>{t}</option>
-            ))}
+            {allTopics.map(t => <option key={t} value={t}>{t}</option>)}
           </select>
-          <select
-            className="input"
-            value={dateRange}
-            onChange={e => setDateRange(e.target.value)}
-          >
+          <select className="input-hermes" value={dateRange} onChange={e => setDateRange(e.target.value)}>
             <option value="all">Todo el tiempo</option>
             <option value="24h">Ultimas 24h</option>
             <option value="7d">Ultima semana</option>
             <option value="30d">Ultimo mes</option>
           </select>
           <div className="importance-filter">
-            <label>Importancia min: {minImportance}</label>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={minImportance}
-              onChange={e => setMinImportance(Number(e.target.value))}
-            />
+            <label>Min: {minImportance}</label>
+            <input type="range" min="0" max="100" value={minImportance}
+              onChange={e => setMinImportance(Number(e.target.value))} />
           </div>
         </div>
-        <div className="map-stats">
-          {filteredEvents.length} eventos mostrados
-          {filteredEvents.length !== allEvents.length && ` de ${allEvents.length} total`}
-          {' '} | {clusteredEvents.length} zonas
+        <div className="map-stats-row">
+          <span>{filteredEvents.length} eventos</span>
+          <span>{clusteredEvents.length} zonas</span>
         </div>
       </div>
 
-      {/* Leyenda de colores */}
-      <div className="map-legend">
+      {/* Legend */}
+      <div className="map-legend-hermes">
         <span className="legend-title">Leyenda:</span>
         {tab === 'world' ? (
           <>
-            <span className="legend-item"><span className="legend-dot" style={{background:'#e74c3c'}}></span>Politica</span>
-            <span className="legend-item"><span className="legend-dot" style={{background:'#e67e22'}}></span>Geopolítica</span>
-            <span className="legend-item"><span className="legend-dot" style={{background:'#2ecc71'}}></span>Economía</span>
-            <span className="legend-item"><span className="legend-dot" style={{background:'#3498db'}}></span>Tecnología</span>
-            <span className="legend-item"><span className="legend-dot" style={{background:'#9b59b6'}}></span>Deportes</span>
-            <span className="legend-item"><span className="legend-dot" style={{background:'#1abc9c'}}></span>Cultura</span>
-            <span className="legend-item"><span className="legend-dot" style={{background:'#f39c12'}}></span>Otros</span>
-            <span className="legend-item"><span className="legend-dot cluster"></span> Agrupado (varios eventos)</span>
+            <span className="legend-item"><span className="legend-dot" style={{background:'#ef4444'}}></span>Política</span>
+            <span className="legend-item"><span className="legend-dot" style={{background:'#f97316'}}></span>Geopolítica</span>
+            <span className="legend-item"><span className="legend-dot" style={{background:'#10b981'}}></span>Economía</span>
+            <span className="legend-item"><span className="legend-dot" style={{background:'#06b6d4'}}></span>Tecnología</span>
+            <span className="legend-item"><span className="legend-dot" style={{background:'#8b5cf6'}}></span>Deportes</span>
+            <span className="legend-item"><span className="legend-dot" style={{background:'#14b8a6'}}></span>Cultura</span>
+            <span className="legend-item"><span className="legend-dot" style={{background:'#eab308'}}></span>Otros</span>
           </>
         ) : (
           <>
-            <span className="legend-item"><span className="legend-dot" style={{background:'#9b59b6'}}></span>IA / ML</span>
-            <span className="legend-item"><span className="legend-dot" style={{background:'#e74c3c'}}></span>Seguridad / Crypto</span>
-            <span className="legend-item"><span className="legend-dot" style={{background:'#e67e22'}}></span>Hardware</span>
-            <span className="legend-item"><span className="legend-dot" style={{background:'#2ecc71'}}></span>Software / Open Source</span>
-            <span className="legend-item"><span className="legend-dot" style={{background:'#3498db'}}></span>General</span>
-            <span className="legend-item"><span className="legend-dot cluster"></span> Agrupado (varios eventos)</span>
+            <span className="legend-item"><span className="legend-dot" style={{background:'#8b5cf6'}}></span>IA / ML</span>
+            <span className="legend-item"><span className="legend-dot" style={{background:'#ef4444'}}></span>Seguridad</span>
+            <span className="legend-item"><span className="legend-dot" style={{background:'#f97316'}}></span>Hardware</span>
+            <span className="legend-item"><span className="legend-dot" style={{background:'#10b981'}}></span>Software</span>
+            <span className="legend-item"><span className="legend-dot" style={{background:'#06b6d4'}}></span>General</span>
           </>
         )}
-        <span className="legend-item legend-size">
-          <span className="legend-circle sm"></span> 50
-          <span className="legend-circle md"></span> 75
-          <span className="legend-circle lg"></span> 100
-          <span className="legend-size-label">importancia</span>
+        <span className="legend-separator">|</span>
+        <span className="legend-item"><span className="legend-dot cluster"></span>Agrupado</span>
+        <span className="legend-size">
+          <span className="legend-circle sm"></span>
+          <span className="legend-circle md"></span>
+          <span className="legend-circle lg"></span>
+          <span>importancia</span>
         </span>
       </div>
 
-      <MapContainer
-        center={[20, 0]}
-        zoom={2}
-        minZoom={2}
-        maxZoom={12}
-        className="map-canvas"
-        worldCopyJump
-      >
-        <TileLayer
-          attribution='&copy; OSM | CARTO'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-        />
-        <FlyToBounds events={filteredEvents} />
+      {/* Map */}
+      <div className="map-wrapper-hermes">
+        <div className="map-grid-overlay"></div>
+        <MapContainer center={[20, 0]} zoom={2} minZoom={2} maxZoom={12}
+          className="map-canvas-hermes" worldCopyJump>
+          <TileLayer
+            attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          />
+          <HermesGrid />
+          <FlyToBounds events={filteredEvents} />
 
-        {clusteredEvents.map(({ key, coords, events, count }) => (
-          <CircleMarker
-            key={key}
-            center={coords}
-            radius={count > 1 ? Math.min(25, 8 + count * 2) : getEventRadius(events[0])}
-            pathOptions={{
-              color: count > 1 ? '#e74c3c' : getEventColor(events[0], tab),
-              fillColor: count > 1 ? '#e74c3c' : getEventColor(events[0], tab),
-              fillOpacity: 0.6,
-              weight: 2,
-            }}
-            eventHandlers={{
-              click: () => {
-                if (count === 1) {
-                  setSelectedEvent(events[0])
-                }
-              }
-            }}
-          >
-            <Popup>
-              <div className="map-popup">
-                {count > 1 ? (
-                  <>
-                    <h4>{count} eventos en esta zona</h4>
-                    <div className="popup-events-list">
-                      {events.slice(0, 10).map((ev, i) => (
-                        <div key={i} className="popup-event-item" onClick={() => setSelectedEvent(ev)}>
-                          <strong>{ev.title || ev.summary || 'Sin titulo'}</strong>
-                          <span className="popup-meta">
-                            {ev.source && ` ${ev.source}`}
-                            {ev.importance && ` ${ev.importance}`}
-                          </span>
-                        </div>
-                      ))}
-                      {count > 10 && <div className="popup-more">...y {count - 10} mas</div>}
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <h4>{events[0].title || events[0].summary || 'Evento'}</h4>
-                    {events[0].summary && events[0].summary !== events[0].title && (
-                      <p className="popup-summary">{events[0].summary}</p>
-                    )}
-                    <div className="popup-meta">
-                      {events[0].source && <div> {events[0].source}</div>}
-                      {events[0].countries && <div> {events[0].countries.join(', ')}</div>}
-                      {events[0].importance && <div> {events[0].importance}</div>}
-                      {events[0].topics && <div> {events[0].topics.join(', ')}</div>}
-                    </div>
-                    {onEditEvent && (
-                      <button
-                        className="btn btn-sm btn-primary popup-edit-btn"
-                        onClick={() => onEditEvent(events[0])}
-                      >
-                        Editar
-                      </button>
-                    )}
-                  </>
-                )}
-              </div>
-            </Popup>
-          </CircleMarker>
-        ))}
-      </MapContainer>
+          {clusteredEvents.map(({ key, coords, events, count }) => (
+            <CircleMarker key={key} center={coords}
+              radius={count > 1 ? Math.min(28, 10 + count * 2) : getEventRadius(events[0])}
+              pathOptions={{
+                color: count > 1 ? '#ef4444' : getEventColor(events[0], tab),
+                fillColor: count > 1 ? '#ef4444' : getEventColor(events[0], tab),
+                fillOpacity: 0.65,
+                weight: 2,
+              }}
+              eventHandlers={{
+                click: () => { if (count === 1) setSelectedEvent(events[0]) }
+              }}
+            >
+              <Popup>
+                <div className="map-popup-hermes">
+                  {count > 1 ? (
+                    <>
+                      <h4>{count} eventos en esta zona</h4>
+                      <div className="popup-list">
+                        {events.slice(0, 8).map((ev, i) => (
+                          <div key={i} className="popup-item" onClick={() => setSelectedEvent(ev)}>
+                            <strong>{ev.title || 'Sin titulo'}</strong>
+                            <span>{ev.source} {ev.importance && `⭐${ev.importance}`}</span>
+                          </div>
+                        ))}
+                        {count > 8 && <div className="popup-more">...y {count - 8} mas</div>}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <h4>{events[0].title || 'Evento'}</h4>
+                      {events[0].summary && <p className="popup-desc">{events[0].summary}</p>}
+                      <div className="popup-meta-hermes">
+                        {events[0].source && <span>📌 {events[0].source}</span>}
+                        {events[0].countries && <span>🌍 {events[0].countries.join(', ')}</span>}
+                        {events[0].importance && <span>⭐ {events[0].importance}</span>}
+                        {events[0].topics && <span>🏷️ {events[0].topics.join(', ')}</span>}
+                      </div>
+                      {onEditEvent && (
+                        <button className="btn-hermes btn-sm popup-edit"
+                          onClick={() => onEditEvent(events[0])}>🛠️ Editar</button>
+                      )}
+                    </>
+                  )}
+                </div>
+              </Popup>
+            </CircleMarker>
+          ))}
+        </MapContainer>
+      </div>
 
+      {/* Event detail panel */}
       {selectedEvent && (
-        <div className="event-detail-panel">
-          <div className="event-detail-header">
+        <div className="event-panel-hermes">
+          <div className="event-panel-header">
             <h3>{selectedEvent.title || 'Evento'}</h3>
-            <button className="btn-close" onClick={() => setSelectedEvent(null)}>X</button>
+            <button className="btn-close-hermes" onClick={() => setSelectedEvent(null)}>✕</button>
           </div>
-          <div className="event-detail-body">
+          <div className="event-panel-body">
             {selectedEvent.summary && <p>{selectedEvent.summary}</p>}
-            <div className="detail-meta">
-              {selectedEvent.source && <div> {selectedEvent.source}</div>}
-              {selectedEvent.countries && <div> {selectedEvent.countries.join(', ')}</div>}
-              {selectedEvent.topics && <div> {selectedEvent.topics.join(', ')}</div>}
-              {selectedEvent.importance !== undefined && <div> {selectedEvent.importance}</div>}
-              {selectedEvent.popularity !== undefined && <div> {selectedEvent.popularity}</div>}
-              {selectedEvent.timestamp && <div> {selectedEvent.timestamp}</div>}
-              {selectedEvent.url && (
-                <div><a href={selectedEvent.url} target="_blank" rel="noopener noreferrer">Enlace</a></div>
-              )}
+            <div className="event-meta-grid">
+              {selectedEvent.source && <div className="meta-cell">📌 {selectedEvent.source}</div>}
+              {selectedEvent.countries && <div className="meta-cell">🌍 {selectedEvent.countries.join(', ')}</div>}
+              {selectedEvent.topics && <div className="meta-cell">🏷️ {selectedEvent.topics.join(', ')}</div>}
+              {selectedEvent.importance !== undefined && <div className="meta-cell">⭐ {selectedEvent.importance}</div>}
+              {selectedEvent.popularity !== undefined && <div className="meta-cell">📈 {selectedEvent.popularity}</div>}
+              {selectedEvent.timestamp && <div className="meta-cell">🕐 {selectedEvent.timestamp}</div>}
+              {selectedEvent.url && <div className="meta-cell"><a href={selectedEvent.url} target="_blank" rel="noopener noreferrer">🔗 Enlace</a></div>}
             </div>
             {onEditEvent && (
-              <button
-                className="btn btn-primary"
-                onClick={() => onEditEvent(selectedEvent)}
-              >
-                Editar evento
+              <button className="btn-hermes btn-primary" onClick={() => onEditEvent(selectedEvent)}>
+                🛠️ Editar evento
               </button>
             )}
           </div>
